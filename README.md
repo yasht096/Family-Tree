@@ -1,6 +1,6 @@
 # Your Clan - A Family Tree Website
 
->Families are like fudge – mostly sweet with nuts. So create your amazing family fudges with us.
+> Families are like fudge – mostly sweet with nuts. So create your amazing family fudges with us.
 
 Your clan is a beautiful user friendly website where users can create there family trees.
 
@@ -14,5 +14,4 @@ It is often said that, “Family tree has many branches, both living and dead…
 3. Bootstrap V4.3.1
 
 ###Screenshots
-![GitHub Logo](/screenshots/home part 1.png)
-Format: ![Alt Text](url)
+![Image of Home Page](/screenshots/home part 1.png)
