@@ -15,3 +15,6 @@ It is often said that, “Family tree has many branches, both living and dead…
 
 ### Screenshots
 ![Image of Home Page](https://github.com/yash-trivedi-dev/Family-Tree/blob/master/screenshots/home%20part%201.png)
+
+##### Team Members
+![Image of Home Page](https://github.com/yash-trivedi-dev/Family-Tree/blob/master/screenshots/home%20part%203.png)
