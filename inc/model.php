@@ -63,13 +63,13 @@
         global $db;
         if(checkEmail($_POST['email']))
         {
-            $insert_user = $db->prepare("INSERT INTO `user` (`id`, `fname`, `lname`, `profile`, `email`, `password`, `role`, `status`, `created_date`) VALUES (NULL, '".$_POST['fname']."','".$_POST['lname']."','".AVATAR."','".$_POST['email']."','".password_hash($_POST['pass'], PASSWORD_DEFAULT)."','".USERROLE."','".ACTIVE."', CURRENT_TIMESTAMP)");
+            $insert_user = $db->prepare("INSERT INTO `user` (`id`, `fname`, `lname`, `profile`, `email`, `password`, `role`, `status`, `created_date`) VALUES (NULL, '".mysqli_real_escape_string($db,$_POST['fname'])."','".mysqli_real_escape_string($db,$_POST['lname'])."','".AVATAR."','".mysqli_real_escape_string($db,$_POST['email'])."','".password_hash(mysqli_real_escape_string($db,$_POST['pass']), PASSWORD_DEFAULT)."','".USERROLE."','".ACTIVE."', CURRENT_TIMESTAMP)");
             $insert_user->execute();
             $inserted_user_id = $db->lastInsertId();
             $create_family = $db->prepare("INSERT INTO `family`(`id`, `user_id`) VALUES (NULL,".$inserted_user_id.")");
             $create_family->execute();
             $family_id = $db->lastInsertId();
-            $add_member = $db->prepare("INSERT INTO `members`(`id`, `family_id`, `fname`, `lname`, `profile`) VALUES (NULL,$family_id,'".$_POST['fname']."','".$_POST['lname']."','".AVATAR."')");
+            $add_member = $db->prepare("INSERT INTO `members`(`id`, `family_id`, `fname`, `lname`, `profile`) VALUES (NULL,$family_id,'".mysqli_real_escape_string($db,$_POST['fname'])."','".mysqli_real_escape_string($db,$_POST['lname'])."','".AVATAR."')");
             $add_member->execute();
             startSession($inserted_user_id);
         }
@@ -80,11 +80,11 @@
      */
     function loginUser(){
         global $db;
-        $get_email = $db->prepare("SELECT id,email,password FROM user WHERE email = '".$_POST['email']."'");
+        $get_email = $db->prepare("SELECT id,email,password FROM user WHERE email = '".mysqli_real_escape_string($db,$_POST['email'])."'");
         $get_email->execute();
         if($user_details = $get_email->fetch())
         {
-            if(password_verify($_POST['pass'],$user_details['password']))
+            if(password_verify(mysqli_real_escape_string($db,$_POST['pass']),$user_details['password']))
             {
                 startSession($user_details['id']);
             }
@@ -196,7 +196,7 @@
     function updateProfile()
     {
         global $db;
-        $update_user_query = "UPDATE `user` SET `fname`='". $_POST['fname'] ."',`lname`='". $_POST['lname'] ."',`gender`='". $_POST['gender'] ."'";
+        $update_user_query = "UPDATE `user` SET `fname`='". mysqli_real_escape_string($db,$_POST['fname']) ."',`lname`='". mysqli_real_escape_string($db,$_POST['lname']) ."',`gender`='". mysqli_real_escape_string($db,$_POST['gender']) ."'";
         if($_FILES['avatar'])
         {
             if($path = fileUpload())
@@ -248,17 +248,17 @@
     function loginValidation()
     {
         $hasError = false;
-        if(empty($_POST['email']))
+        if(empty(mysqli_real_escape_string($db,$_POST['email'])))
         {
             $GLOBALS['loginEmailErr'] = 'Email is Required.';
             $hasError = true;
         } 
-        elseif(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
+        elseif(!filter_var(mysqli_real_escape_string($db,$_POST['email']), FILTER_VALIDATE_EMAIL))
         {
             $GLOBALS['loginEmailErr'] = 'Invalid Email';
             $hasError = true;
         }
-        if(empty($_POST['pass']))
+        if(empty(mysqli_real_escape_string($db,$_POST['pass'])))
         {
             $GLOBALS['loginPassErr'] = 'Password is Required.';
             $hasError = true;
@@ -271,12 +271,12 @@
      */
     function signupValidation(){
         $hasError = false;
-        if(empty($_POST['fname']))
+        if(empty(mysqli_real_escape_string($db,$_POST['fname'])))
         {
             $GLOBALS['fnameErr'] = 'First Name is Required.';
             $hasError = true;
         }
-        if(empty($_POST['lname']))
+        if(empty(mysqli_real_escape_string($db,$_POST['lname'])))
         {
             $GLOBALS['lnameErr'] = 'Last Name is Required.';
             $hasError = true;
@@ -286,27 +286,27 @@
         //     $GLOBALS['genderErr'] = 'Gender is Required.';
         //     $hasError = true;
         // }
-        if(empty($_POST['email']))
+        if(empty(mysqli_real_escape_string($db,$_POST['email'])))
         {
             $GLOBALS['emailErr'] = 'Email is Required.';
             $hasError = true;
         } 
-        elseif(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
+        elseif(!filter_var(mysqli_real_escape_string($db,$_POST['email']), FILTER_VALIDATE_EMAIL))
         {
             $GLOBALS['emailErr'] = 'Invalid Email';
             $hasError = true;
         }
-        if(empty($_POST['pass']))
+        if(empty(mysqli_real_escape_string($db,$_POST['pass'])))
         {
             $GLOBALS['passErr'] = 'Password is Required.';
             $hasError = true;
         }
-        if(empty($_POST['cpass']))
+        if(empty(mysqli_real_escape_string($db,$_POST['cpass'])))
         {
             $GLOBALS['cpassErr'] = 'Confirm Password is Required.';
             $hasError = true;
         }
-        if($_POST['pass'] != $_POST['cpass'])
+        if(mysqli_real_escape_string($db,$_POST['pass']) != mysqli_real_escape_string($db,$_POST['cpass']))
         {
             $GLOBALS['cpassErr'] = 'Password not matched.';
             $hasError = true;
@@ -317,26 +317,26 @@
     function changePasswordValidation()
     {
         $hasError = false;
-        if(empty($_POST['oldPassword']))
+        if(empty(mysqli_real_escape_string($db,$_POST['oldPassword'])))
         {
             $GLOBALS['oldPassErr'] = 'Old Password is Required.';
             $hasError = true;
-        } elseif(!verifyUserPassword($_POST['oldPassword']))
+        } elseif(!verifyUserPassword(mysqli_real_escape_string($db,$_POST['oldPassword'])))
         {
             $GLOBALS['oldPassErr'] = 'Old Password not matched.';
             $hasError = true;
         }
-        if(empty($_POST['newPassword']))
+        if(empty(mysqli_real_escape_string($db,$_POST['newPassword'])))
         {
             $GLOBALS['newPassErr'] = 'New Password is Required.';
             $hasError = true;
         }
-        if(empty($_POST['cPassword']))
+        if(empty(mysqli_real_escape_string($db,$_POST['cPassword'])))
         {
             $GLOBALS['cPassErr'] = 'Confirm Password is Required.';
             $hasError = true;
         }
-        if($_POST['newPassword'] != $_POST['cPassword'])
+        if(mysqli_real_escape_string($db,$_POST['newPassword']) != mysqli_real_escape_string($db,$_POST['cPassword']))
         {
             $GLOBALS['cPassErr'] = 'Confirm Password not matched.';
             $hasError = true;
@@ -353,17 +353,17 @@
 
     function profileValidation(){
         $hasError = false;
-        if(empty($_POST['fname']))
+        if(empty(mysqli_real_escape_string($db,$_POST['fname'])))
         {
             $GLOBALS['fnameErr'] = 'First Name is Required.';
             $hasError = true;
         }
-        if(empty($_POST['lname']))
+        if(empty(mysqli_real_escape_string($db,$_POST['lname'])))
         {
             $GLOBALS['lnameErr'] = 'Last Name is Required.';
             $hasError = true;
         }
-        if(empty($_POST['gender']))
+        if(empty(mysqli_real_escape_string($db,$_POST['gender'])))
         {
             $GLOBALS['genderErr'] = 'Gender is Required.';
             $hasError = true;
@@ -400,7 +400,8 @@
     function addMember()
     {
         global $db;
-        $add_member = $db->prepare("INSERT INTO `members`(`id`, `family_id`, `father_id`, `mother_id`, `spouse_id`, `fname`, `lname`, `gender`, `dob`, `profile`) VALUES (NULL,".$_SESSION['familyId'].",NULL,NULL,NULL,'".$_POST['fname']."','".$_POST['lname']."','".$_POST['gender']."','".$_POST['dob']."', '".AVATAR."')");
+        $add_member = $db->prepare("INSERT INTO `members`(`id`, `family_id`, `father_id`, `mother_id`, `spouse_id`, `fname`, `lname`, `gender`, `dob`, `profile`) VALUES (NULL,".$_SESSION['familyId'].",NULL,NULL,NULL,'".
+                                    ['fname']."','".mysqli_real_escape_string($db,$_POST['lname'])."','".mysqli_real_escape_string($db,$_POST['gender'])."','".mysqli_real_escape_string($db,$_POST['dob'])."', '".AVATAR."')");
         $add_member->execute();
         if($add_member->errorInfo()[0] == "00000")
         {
@@ -412,25 +413,25 @@
     function updateMember()
     {
         global $db;
-        $update_member_query = "UPDATE `members` SET `fname`='". $_POST['fname'] ."',`lname`='". $_POST['lname'] ."',`gender`='". $_POST['gender'] ."',`dob`='". $_POST['dob'] ."'";
+        $update_member_query = "UPDATE `members` SET `fname`='". mysqli_real_escape_string($db,$_POST['fname']) ."',`lname`='". mysqli_real_escape_string($db,$_POST['lname']) ."',`gender`='". mysqli_real_escape_string($db,$_POST['gender']) ."',`dob`='". mysqli_real_escape_string($db,$_POST['dob']) ."'";
         if($_FILES['avatar'])
         {
             if($path = fileUpload())
                 $update_member_query .= ",`profile`='". $path ."'";
         }
-        if(isset($_POST['spouseId']))
+        if(isset(mysqli_real_escape_string($db,$_POST['spouseId'])))
         {
-            updateSpouse($_POST['spouseId'], $_POST['memberId']);
+            updateSpouse(mysqli_real_escape_string($db,$_POST['spouseId']), mysqli_real_escape_string($db,$_POST['memberId']));
         }
-        if(isset($_POST['fatherId']))
+        if(isset(mysqli_real_escape_string($db,$_POST['fatherId'])))
         {
-            updateFather($_POST['fatherId'], $_POST['memberId']);
+            updateFather(mysqli_real_escape_string($db,$_POST['fatherId']), mysqli_real_escape_string($db,$_POST['memberId']));
         }
-        if(isset($_POST['motherId']))
+        if(isset(mysqli_real_escape_string($db,$_POST['motherId'])))
         {
-            updateMother($_POST['motherId'], $_POST['memberId']);
+            updateMother(mysqli_real_escape_string($db,$_POST['motherId']), mysqli_real_escape_string($db,$_POST['memberId']));
         }
-        $update_member_query .= " WHERE id = ".$_POST['memberId'];
+        $update_member_query .= " WHERE id = ".mysqli_real_escape_string($db,$_POST['memberId']);
         $update_member = $db->prepare($update_member_query);
         $update_member->execute();
         if($update_member->errorInfo()[0] == "00000")
@@ -464,7 +465,7 @@
         $headers = array(
                     'From' => 'info@yourclan.com'
                     );
-        $query = $db->prepare("UPDATE `user` SET `password`='". $password ."' WHERE `email`='". $_POST['email'] ."'");
+        $query = $db->prepare("UPDATE `user` SET `password`='". $password ."' WHERE `email`='". mysqli_real_escape_string($db,$_POST['email']) ."'");
         $query->execute();
         if($query->errorInfo()[0] == "00000")
         {
@@ -483,10 +484,10 @@
 
     function contactForm(){
         $to = CONTACTEMAIL;
-        $subject = $_POST['name']." : ".$_POST['subject'];
-        $message = $_POST['message'];
+        $subject = mysqli_real_escape_string($db,$_POST['name'])." : ".mysqli_real_escape_string($db,$_POST['subject']);
+        $message = mysqli_real_escape_string($db,$_POST['message']);
         $headers = array(
-                    'From' => $_POST['email']
+                    'From' => mysqli_real_escape_string($db,$_POST['email'])
                     );
         
         if(mail($to , $subject , $message , $headers))
@@ -502,15 +503,15 @@
     function deleteMember()
     {
         global $db;
-        $query = $db->prepare("DELETE FROM `members` WHERE id = ".$_POST['memberId']);
+        $query = $db->prepare("DELETE FROM `members` WHERE id = ".mysqli_real_escape_string($db,$_POST['memberId']));
         $query->execute();
         if($query->errorInfo()[0] == "00000")
         {
-            $update_spouse = $db->prepare("UPDATE `members` SET `spouse_id`=NULL WHERE spouse_id  = ".$_POST['memberId']);
+            $update_spouse = $db->prepare("UPDATE `members` SET `spouse_id`=NULL WHERE spouse_id  = ".mysqli_real_escape_string($db,$_POST['memberId']));
             $update_spouse->execute();
-            $update_father = $db->prepare("UPDATE `members` SET `father_id`=NULL WHERE father_id  = ".$_POST['memberId']);
+            $update_father = $db->prepare("UPDATE `members` SET `father_id`=NULL WHERE father_id  = ".mysqli_real_escape_string($db,$_POST['memberId']));
             $update_father->execute();
-            $update_mother = $db->prepare("UPDATE `members` SET `mother_id`=NULL WHERE mother_id  = ".$_POST['memberId']);
+            $update_mother = $db->prepare("UPDATE `members` SET `mother_id`=NULL WHERE mother_id  = ".mysqli_real_escape_string($db,$_POST['memberId']));
             $update_mother->execute();
             $GLOBALS['successMsg'] = "Delete Member Successfully";
         } else {
